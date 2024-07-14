@@ -1,0 +1,42 @@
+export const receiptCategories = [
+  "Groceries",
+  "Food & Dining",
+  "Shopping",
+  "Utilities",
+  "Entertainment",
+  "Transportation",
+  "Office Supplies & Equipment",
+  "Professional Services",
+  "Repairs & Maintenance",
+  "Rent & Lease",
+  "Insurance",
+  "Miscellaneous",
+  "Other",
+];
+
+export const itemCategories = [
+  "Fruits",
+  "Vegetables",
+  "Canned Goods",
+  "Dairy",
+  "Meat",
+  "Fish & Seafood",
+  "Deli",
+  "Condiments & Spices",
+  "Professional Services",
+  "Repairs & Maintenance",
+  "Snacks",
+  "Bread & Bakery",
+  "Beverages",
+  "Pasta, Rice & Cereal",
+  "Baking",
+  "Frozen Foods",
+  "Personal Care",
+  "Health Care",
+  "Household & Cleaning Supplies",
+  "Baby Items",
+  "Pet Care",
+  "Other",
+];
+
+export const transactionTypes = ["Expense", "Income"];
