@@ -32,7 +32,7 @@ import {
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
-import { CalendarIcon, Loader2, Plus } from "lucide-react";
+import { CalendarIcon, ClipboardMinus, Loader2, Plus } from "lucide-react";
 import { Card, CardContent } from "../components/ui/card";
 import { useEffect, useState } from "react";
 import {
@@ -330,7 +330,10 @@ function TransactionDetails() {
             />
           </div>
         ) : (
-          <></>
+          <div className="shadow border flex flex-col justify-center items-center card rounded-lg">
+            <ClipboardMinus className="w-[80px] h-[80px] text-[80px]" />
+            <p className="font-bold">No document was attached</p>
+          </div>
         )}
         <Card>
           <CardContent className="py-2">
