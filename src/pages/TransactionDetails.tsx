@@ -20,6 +20,7 @@ import {
   transactionTypes,
 } from "../utils/Constants";
 import { Item } from "../models/item";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,8 +68,9 @@ export const initialTransactionState: Transaction = {
   totalPrice: 0,
   transactionType: "",
 };
-function TransactionDetails() {
+export default function TransactionDetails() {
   const { toast } = useToast();
+
   const { transactionId } = useParams();
   const [isAddingTransaction, setIsAddingTransaction] =
     useState<boolean>(false);
@@ -78,6 +80,7 @@ function TransactionDetails() {
     category: "",
     date: "",
   });
+
   const [createTransaction, setCreateTransaction] = useState<Transaction>(
     initialTransactionState
   );
@@ -143,9 +146,13 @@ function TransactionDetails() {
   const onDateChanged = (date: Date | undefined) => {
     if (date) {
       setDate(date);
+      const d = new Date();
+      d.setDate(date.getDate());
+      const formmatedDate = d.toISOString().split("T")[0];
+      console.log(`formated date is ${formmatedDate}`);
       setCreateTransaction({
         ...createTransaction,
-        date: new Date(date.getTime()).toISOString(),
+        date: formmatedDate,
       });
     }
   };
@@ -400,12 +407,19 @@ function TransactionDetails() {
   return (
     <div className="md:container w-full md:mx-auto">
       <div className={"grid grid-cols-1 md:grid-cols-2 gap-2"}>
-        {createTransaction.attachment !== undefined &&
-        createTransaction.attachment !== null ? (
+        {(createTransaction.receiptUrl !== undefined &&
+          createTransaction.receiptUrl !== null) ||
+        (createTransaction.attachment !== null &&
+          createTransaction.attachment !== undefined) ? (
           <div className="shadow border rounded-lg">
             <img
               className="object-cover p-2 rounded-lg"
-              src={createTransaction.attachment}
+              src={
+                createTransaction.attachment == null ||
+                createTransaction.attachment == undefined
+                  ? createTransaction.receiptUrl
+                  : createTransaction.attachment
+              }
               alt="receipt"
             />
           </div>
@@ -788,5 +802,3 @@ function TransactionDetails() {
     </div>
   );
 }
-
-export default TransactionDetails;

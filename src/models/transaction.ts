@@ -10,4 +10,5 @@ export interface Transaction {
   totalPrice: number;
   transactionType: string;
   attachment?: string;
+  receiptUrl?: string;
 }
