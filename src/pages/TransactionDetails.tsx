@@ -42,7 +42,11 @@ import {
 } from "../utils/Validations";
 import { useToast } from "../components/ui/use-toast";
 import { Transaction } from "../models/transaction";
-import { deleteTransaction, saveTransaction } from "../services/ApiService";
+import {
+  deleteTransaction,
+  saveTransaction,
+  updateTransaction,
+} from "../services/ApiService";
 import { useTransactionsStore } from "../stores/transaction-store";
 import { useSelectedTransactionStore } from "../stores/selected-transaction-store";
 import { useNavigate, useParams } from "react-router-dom";
@@ -83,6 +87,8 @@ function TransactionDetails() {
     price: 0,
     quantity: 0,
   });
+
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   const [isDeleting, setDeleting] = useState<boolean>(false);
 
@@ -152,6 +158,76 @@ function TransactionDetails() {
       ...createTransaction,
       [name]: value,
     });
+  };
+
+  const confirmUpdate = async () => {
+    setIsUpdating(true);
+    const response = await updateTransaction(createTransaction);
+
+    if (response) {
+      const updatedTransaction: Transaction[] =
+        transactionsStore.transactions.map((t) => {
+          if (t.id !== transactionId) {
+            return t;
+          }
+          return response;
+        });
+
+      transactionsStore.setTransactions(updatedTransaction);
+      toast({
+        title: "success message",
+        description: "transaction updated successfully",
+      });
+    }
+
+    setIsUpdating(false);
+  };
+
+  const onUpdateClicked = async () => {
+    try {
+      if (createTransaction.id === undefined || createTransaction.id === null) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "no transaction was found",
+        });
+        return;
+      }
+
+      if (createTransaction.transactionType === "Expense") {
+        transactionSchema
+          .validate(createTransaction)
+          .then(async () => {
+            await confirmUpdate();
+          })
+          .catch(function () {
+            toast({
+              variant: "destructive",
+              title: "error message",
+              description: "you must enter all required data",
+            });
+          });
+      } else if (createTransaction.transactionType === "Income") {
+        validateTransactionWithoutItemsSchema
+          .validate(createTransaction)
+          .then(async () => {
+            await confirmUpdate();
+          })
+          .catch(function () {
+            toast({
+              variant: "destructive",
+              title: "error message",
+              description: "you must enter all required data",
+            });
+          });
+      }
+    } catch (e: any) {
+      toast({
+        variant: "destructive",
+        title: "error message",
+        description: e.message,
+      });
+    }
   };
 
   const onAddNewItemClicked = () => {
@@ -266,54 +342,58 @@ function TransactionDetails() {
   };
 
   // to save the new transaction to the database
-  const onSaveClicked = () => {
-    console.log("saved called");
-    // reset the errors
-    setErrorState({
-      merchant: "",
-      category: "",
-      totalPrice: "",
-      date: "",
-    });
+  const onSaveClicked = async () => {
+    if (transactionId === undefined || transactionId === null) {
+      console.log("saved called");
+      // reset the errors
+      setErrorState({
+        merchant: "",
+        category: "",
+        totalPrice: "",
+        date: "",
+      });
 
-    if (createTransaction.transactionType === "Income") {
-      validateTransactionWithoutItemsSchema
-        .validate(createTransaction, { abortEarly: false })
-        .then(async () => {
-          await saveTransactionToDb();
-        })
-        .catch(function (error) {
-          error.inner.forEach((err: any) => {
-            console.log(err.path);
-            if (err.path == "merchant.name") {
-              setErrorState({
-                ...errorState,
-                merchant: "merchant cannot be null or empty",
-              });
-            } else {
-              setErrorState({ ...errorState, [err.path]: err.message });
-            }
+      if (createTransaction.transactionType === "Income") {
+        validateTransactionWithoutItemsSchema
+          .validate(createTransaction, { abortEarly: false })
+          .then(async () => {
+            await saveTransactionToDb();
+          })
+          .catch(function (error) {
+            error.inner.forEach((err: any) => {
+              console.log(err.path);
+              if (err.path == "merchant.name") {
+                setErrorState({
+                  ...errorState,
+                  merchant: "merchant cannot be null or empty",
+                });
+              } else {
+                setErrorState({ ...errorState, [err.path]: err.message });
+              }
+            });
           });
-        });
+      } else {
+        transactionSchema
+          .validate(createTransaction, { abortEarly: false })
+          .then(async () => {
+            await saveTransactionToDb();
+          })
+          .catch(function (error) {
+            error.inner.forEach((err: any) => {
+              console.log(err.path);
+              if (err.path == "merchant.name") {
+                setErrorState({
+                  ...errorState,
+                  merchant: "merchant cannot be null or empty",
+                });
+              } else {
+                setErrorState({ ...errorState, [err.path]: err.message });
+              }
+            });
+          });
+      }
     } else {
-      transactionSchema
-        .validate(createTransaction, { abortEarly: false })
-        .then(async () => {
-          await saveTransactionToDb();
-        })
-        .catch(function (error) {
-          error.inner.forEach((err: any) => {
-            console.log(err.path);
-            if (err.path == "merchant.name") {
-              setErrorState({
-                ...errorState,
-                merchant: "merchant cannot be null or empty",
-              });
-            } else {
-              setErrorState({ ...errorState, [err.path]: err.message });
-            }
-          });
-        });
+      await onUpdateClicked();
     }
   };
 
@@ -661,13 +741,20 @@ function TransactionDetails() {
 
               {!isAddingTransaction ? (
                 <div className="flex w-full gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={onSaveClicked}
-                  >
-                    {transactionId ? "Update" : "Save"}
-                  </Button>
+                  {isUpdating === false ? (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={onSaveClicked}
+                    >
+                      {transactionId ? "Update" : "Save"}
+                    </Button>
+                  ) : (
+                    <Button disabled>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Please wait
+                    </Button>
+                  )}
 
                   {transactionId ? (
                     isDeleting === false ? (

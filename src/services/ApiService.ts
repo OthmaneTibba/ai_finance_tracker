@@ -90,3 +90,31 @@ export async function deleteTransaction(
     throw new Error("error occured please try again");
   }
 }
+
+export async function updateTransaction(
+  transaction: Transaction
+): Promise<Transaction> {
+  try {
+    const accessToken = await getAccessToken();
+    const request = await fetch(
+      `${BASE_URL}/UpdateTransaction?transactionId=${transaction.id}`,
+      {
+        method: "put",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transaction),
+      }
+    );
+
+    if (request.status !== 200)
+      throw new Error("error occured please try again");
+
+    const data: Transaction = await request.json();
+
+    return data;
+  } catch (e) {
+    throw new Error("error occured please try again");
+  }
+}
