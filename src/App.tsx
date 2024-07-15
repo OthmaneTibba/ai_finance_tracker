@@ -11,6 +11,7 @@ import UnProtectedRoutes from "./utils/UnProtectedRoutes";
 import Receipt from "./pages/Receipt";
 import Transactions from "./pages/Transactions";
 import TransactionDetails from "./pages/TransactionDetails";
+import { ThemeProvider } from "./components/ThemeProvider";
 
 export default function App() {
   const userStore = useUserStore();
@@ -25,27 +26,29 @@ export default function App() {
     }
   }, []);
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<UnProtectedRoutes />}>
-          <Route path="/" element={<Home />} />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route path="" element={<Dashboard />} />
-            <Route path="receipt" element={<Receipt />} />
-            <Route path="transactions" element={<Transactions />} />
-            <Route
-              path="transactions/deltails"
-              element={<TransactionDetails />}
-            />
-            <Route
-              path="transactions/deltails/:transactionId"
-              element={<TransactionDetails />}
-            />
+    <ThemeProvider defaultTheme="light">
+      <BrowserRouter>
+        <Routes>
+          <Route element={<UnProtectedRoutes />}>
+            <Route path="/" element={<Home />} />
           </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route path="" element={<Dashboard />} />
+              <Route path="receipt" element={<Receipt />} />
+              <Route path="transactions" element={<Transactions />} />
+              <Route
+                path="transactions/deltails"
+                element={<TransactionDetails />}
+              />
+              <Route
+                path="transactions/deltails/:transactionId"
+                element={<TransactionDetails />}
+              />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

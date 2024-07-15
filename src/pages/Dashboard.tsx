@@ -54,9 +54,11 @@ export default function Dashboard() {
   >([]);
 
   const [date, setDate] = useState<DateRange | undefined>({
-    from: addDays(new Date(), -7),
+    from: addDays(new Date(), -30),
     to: new Date(),
   });
+
+  const [expenses, setExpenses] = useState<number>(0);
 
   const getDailyAnalytics = async (
     startDate: string,
@@ -70,6 +72,7 @@ export default function Dashboard() {
     );
 
     setDailyAnalytics(response);
+    setExpenses(response.reduce((acc, elm) => acc + elm.amount, 0));
   };
 
   const getCategoryItemsAnalytics = async (
@@ -108,18 +111,14 @@ export default function Dashboard() {
       getCategoryItemsAnalytics(startDate, endDate),
     ]);
   };
-  const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-  ];
 
   const dailyAnalyticsChartConfig = {
     total: {
       label: "total",
+      color: "hsl(var(--primary))",
+    },
+    amount: {
+      label: "amount",
       color: "hsl(var(--primary))",
     },
   };
@@ -193,8 +192,7 @@ export default function Dashboard() {
             </Button>
           </CardFooter>
         </Card>
-        <DashboardCard />
-        <DashboardCard />
+        <DashboardCard amount={expenses} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
@@ -217,7 +215,8 @@ export default function Dashboard() {
                   tickFormatter={(value) => value.slice(0, 10)}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="total" fill="var(--primary)" radius={4} />
+                <Bar dataKey="total" fill="var(--color-desktop)" radius={4} />
+                <Bar dataKey="amount" fill="var(--color-desktop)" radius={4} />
               </BarChart>
             </ChartContainer>
           </CardContent>
