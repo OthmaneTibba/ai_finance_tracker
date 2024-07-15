@@ -101,7 +101,8 @@ export async function updateTransaction(
   transaction: Transaction
 ): Promise<Transaction> {
   try {
-    const accessToken = await msalInstance.acquireTokenSilent(loginRequest);
+    const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+      .accessToken;
     const request = await fetch(
       `${BASE_URL}/UpdateTransaction?transactionId=${transaction.id}`,
       {
@@ -132,7 +133,8 @@ export async function getDailyExpenseAnalytics(
   transactionType: string
 ): Promise<TotalTarnsactionAnalytics[]> {
   try {
-    const accessToken = await msalInstance.acquireTokenSilent(loginRequest);
+    const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+      .accessToken;
 
     const request = await fetch(
       `${BASE_URL}/GetTotalTransactionAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
@@ -159,7 +161,8 @@ export async function getTopCategoryItemAnalytics(
   transactionType: string
 ): Promise<CategoryItemAnalytics[]> {
   try {
-    const accessToken = await msalInstance.acquireTokenSilent(loginRequest);
+    const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+      .accessToken;
 
     const request = await fetch(
       `${BASE_URL}/GetCategoryItemExpenseAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
