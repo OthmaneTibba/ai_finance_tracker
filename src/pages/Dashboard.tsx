@@ -68,9 +68,14 @@ export default function Dashboard() {
     const account = (await instance.getAllAccounts().length) > 0;
     if (account) {
       instance.setActiveAccount(instance.getAllAccounts()[0]);
-      const accessToken = (await instance.acquireTokenSilent(loginRequest))
-        .accessToken;
-      return accessToken;
+      const account = await instance.acquireTokenSilent(loginRequest);
+      if (userStore.user.email === "") {
+        userStore.setUser({
+          email: account.account.username,
+          isLogged: true,
+        });
+      }
+      return account.accessToken;
     }
     return "";
   }

@@ -335,9 +335,10 @@ export default function TransactionDetails() {
   };
 
   const saveTransactionToDb = async () => {
+    setIsAddingTransaction(true);
     try {
       const token = await getAccessToken();
-      setIsAddingTransaction(true);
+
       const transaction = await saveTransaction(createTransaction, token);
 
       transactionsStore.setTransactions([

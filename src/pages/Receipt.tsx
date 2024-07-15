@@ -34,9 +34,9 @@ function Receipt() {
     const account = (await instance.getAllAccounts().length) > 0;
     if (account) {
       instance.setActiveAccount(instance.getAllAccounts()[0]);
-      const accessToken = (await instance.acquireTokenSilent(loginRequest))
-        .accessToken;
-      return accessToken;
+      const account = await instance.acquireTokenSilent(loginRequest);
+
+      return account.accessToken;
     }
     return "";
   }
@@ -74,9 +74,10 @@ function Receipt() {
       });
       return;
     }
+    setProcessing(true);
     try {
       const token = await getAccessToken();
-      setProcessing(true);
+
       const formData = new FormData();
       formData.append("receiptFile", receiptFile);
       const data = await scanReceipt(formData, token);
