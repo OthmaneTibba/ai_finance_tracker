@@ -1,4 +1,6 @@
 import { loginRequest, msalInstance } from "../authConfig";
+import { CategoryItemAnalytics } from "../models/category_item_analytics";
+import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics";
 
 import { Transaction } from "../models/transaction";
 
@@ -115,6 +117,56 @@ export async function updateTransaction(
 
     return data;
   } catch (e) {
+    throw new Error("error occured please try again");
+  }
+}
+
+export async function getDailyExpenseAnalytics(
+  startDate: string,
+  endDate: string,
+  transactionType: string
+): Promise<TotalTarnsactionAnalytics[]> {
+  try {
+    const accessToken = await getAccessToken();
+    const request = await fetch(
+      `${BASE_URL}/GetTotalTransactionAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
+      {
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const data: TotalTarnsactionAnalytics[] = await request.json();
+
+    return data;
+  } catch {
+    throw new Error("error occured please try again");
+  }
+}
+
+export async function getTopCategoryItemAnalytics(
+  startDate: string,
+  endDate: string,
+  transactionType: string
+): Promise<CategoryItemAnalytics[]> {
+  try {
+    const accessToken = await getAccessToken();
+    const request = await fetch(
+      `${BASE_URL}/GetCategoryItemExpenseAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
+      {
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const data: CategoryItemAnalytics[] = await request.json();
+
+    return data;
+  } catch {
     throw new Error("error occured please try again");
   }
 }
