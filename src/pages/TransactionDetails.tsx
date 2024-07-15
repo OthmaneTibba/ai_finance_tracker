@@ -51,8 +51,6 @@ import {
 import { useTransactionsStore } from "../stores/transaction-store";
 import { useSelectedTransactionStore } from "../stores/selected-transaction-store";
 import { useNavigate, useParams } from "react-router-dom";
-import { loginRequest } from "../authConfig";
-import { useMsal } from "@azure/msal-react";
 type ErrorTransaction = {
   merchant: string;
   totalPrice: string;
@@ -95,24 +93,13 @@ export default function TransactionDetails() {
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  const { instance } = useMsal();
-
   const [isDeleting, setDeleting] = useState<boolean>(false);
-  async function getAccessToken() {
-    const account = (await instance.getAllAccounts().length) > 0;
-    if (account) {
-      instance.setActiveAccount(instance.getAllAccounts()[0]);
-      const accessToken = (await instance.acquireTokenSilent(loginRequest))
-        .accessToken;
-      return accessToken;
-    }
-    return "";
-  }
+
   const onDeleteClicked = async (id: string) => {
     try {
       setDeleting(true);
-      const token = await getAccessToken();
-      const response = await deleteTransaction(id, token);
+
+      const response = await deleteTransaction(id);
       if (response) {
         toast({
           title: "success message",
@@ -183,8 +170,8 @@ export default function TransactionDetails() {
 
   const confirmUpdate = async () => {
     setIsUpdating(true);
-    const token = await getAccessToken();
-    const response = await updateTransaction(createTransaction, token);
+
+    const response = await updateTransaction(createTransaction);
 
     if (response) {
       const updatedTransaction: Transaction[] =
@@ -337,9 +324,7 @@ export default function TransactionDetails() {
   const saveTransactionToDb = async () => {
     setIsAddingTransaction(true);
     try {
-      const token = await getAccessToken();
-
-      const transaction = await saveTransaction(createTransaction, token);
+      const transaction = await saveTransaction(createTransaction);
 
       transactionsStore.setTransactions([
         ...transactionsStore.transactions,
