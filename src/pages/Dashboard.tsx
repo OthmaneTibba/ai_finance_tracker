@@ -1,5 +1,3 @@
-import { useUserStore } from "../stores/user-store";
-
 import DashboardCard from "../components/DashboardCard";
 import {
   Card,
@@ -43,10 +41,8 @@ import {
 import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics";
 import { CategoryItemAnalytics } from "../models/category_item_analytics";
 import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../authConfig";
 
 export default function Dashboard() {
-  const userStore = useUserStore();
   const [dailyAnalytics, setDailyAnalytics] = useState<
     TotalTarnsactionAnalytics[]
   >([]);
@@ -60,37 +56,19 @@ export default function Dashboard() {
     to: new Date(),
   });
 
-  const [expenses, setExpenses] = useState<number>(0);
-
   const { instance } = useMsal();
 
-  async function getAccessToken() {
-    const account = (await instance.getAllAccounts().length) > 0;
-    if (account) {
-      instance.setActiveAccount(instance.getAllAccounts()[0]);
-      const account = await instance.acquireTokenSilent(loginRequest);
-      if (userStore.user.email === "") {
-        userStore.setUser({
-          email: account.account.username,
-          isLogged: true,
-        });
-      }
-      return account.accessToken;
-    }
-    return "";
-  }
+  const [expenses, setExpenses] = useState<number>(0);
 
   const getDailyAnalytics = async (
     startDate: string,
     endDate: string,
     transactionType: string = "Expense"
   ) => {
-    const token = await getAccessToken();
     const response = await getDailyExpenseAnalytics(
       startDate,
       endDate,
-      transactionType,
-      token
+      transactionType
     );
 
     setDailyAnalytics(response);
@@ -102,12 +80,10 @@ export default function Dashboard() {
     endDate: string,
     transactionType: string = "Expense"
   ) => {
-    const token = await getAccessToken();
     const data = await getTopCategoryItemAnalytics(
       startDate,
       endDate,
-      transactionType,
-      token
+      transactionType
     );
     setCategoryItemAnalytics(data);
   };
@@ -160,7 +136,7 @@ export default function Dashboard() {
     <div className="flex flex-col gap-5">
       <div className="py-2 flex flex-col md:flex-row gap-2 md:gap-0 items-center md:justify-between">
         <h1 className="font-extrabold text-2xl md:text-3xl">
-          Hi {userStore.user.email} 👋
+          Hi {instance.getAllAccounts()[0].username} 👋
         </h1>
         <Popover>
           <PopoverTrigger asChild>

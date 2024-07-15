@@ -12,7 +12,6 @@ import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
 } from "@azure/msal-react";
-import Redirect from "./components/Redirect";
 
 export default function App() {
   return (
@@ -20,7 +19,7 @@ export default function App() {
       <BrowserRouter>
         <AuthenticatedTemplate>
           <Routes>
-            <Route path="/" element={<Redirect />} />
+            <Route path="/" element={<Navigate to={"/dashboard"} />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route path="" element={<Dashboard />} />
               <Route path="receipt" element={<Receipt />} />

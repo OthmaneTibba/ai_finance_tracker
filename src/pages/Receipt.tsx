@@ -12,8 +12,6 @@ import { useToast } from "../components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useSelectedTransactionStore } from "../stores/selected-transaction-store";
 import { getTransactionsColumns } from "../Tables/transaction-columns";
-import { loginRequest } from "../authConfig";
-import { useMsal } from "@azure/msal-react";
 
 function Receipt() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -28,22 +26,9 @@ function Receipt() {
     document.getElementById("receipt-input")?.click();
   };
 
-  const { instance } = useMsal();
-
-  async function getAccessToken() {
-    const account = (await instance.getAllAccounts().length) > 0;
-    if (account) {
-      instance.setActiveAccount(instance.getAllAccounts()[0]);
-      const account = await instance.acquireTokenSilent(loginRequest);
-
-      return account.accessToken;
-    }
-    return "";
-  }
   const getTransactions = async () => {
     if (transactionsStore.transactions.length === 0) {
-      const token = await getAccessToken();
-      const data = await getAllTransactions(token);
+      const data = await getAllTransactions();
       transactionsStore.setTransactions(data);
       setTransactions(data);
     } else {
@@ -76,11 +61,9 @@ function Receipt() {
     }
     setProcessing(true);
     try {
-      const token = await getAccessToken();
-
       const formData = new FormData();
       formData.append("receiptFile", receiptFile);
-      const data = await scanReceipt(formData, token);
+      const data = await scanReceipt(formData);
       setProcessing(false);
       setAiResponse(data);
       slectedTransactionStore.setTransaction({

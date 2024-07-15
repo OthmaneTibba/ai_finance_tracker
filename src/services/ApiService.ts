@@ -2,11 +2,12 @@ import { CategoryItemAnalytics } from "../models/category_item_analytics";
 import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics";
 
 import { Transaction } from "../models/transaction";
-
-export async function getAllTransactions(
-  accessToken: string
-): Promise<Transaction[]> {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { msalInstance } from "../main";
+import { loginRequest } from "../authConfig";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export async function getAllTransactions(): Promise<Transaction[]> {
+  const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+    .accessToken;
 
   const request = await fetch(`${BASE_URL}/GetTrancations`, {
     method: "get",
@@ -19,12 +20,11 @@ export async function getAllTransactions(
   return data;
 }
 
-export async function scanReceipt(
-  formData: FormData,
-  accessToken: string
-): Promise<Transaction> {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export async function scanReceipt(formData: FormData): Promise<Transaction> {
   try {
+    const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+      .accessToken;
+
     const request = await fetch(`${BASE_URL}/ReadReceipt`, {
       method: "post",
       headers: {
@@ -45,11 +45,11 @@ export async function scanReceipt(
 }
 
 export async function saveTransaction(
-  createTransaction: Transaction,
-  accessToken: string
+  createTransaction: Transaction
 ): Promise<Transaction> {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
+    const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+      .accessToken;
     const request = await fetch(`${BASE_URL}/CreateTransactions`, {
       method: "post",
       headers: {
@@ -71,11 +71,11 @@ export async function saveTransaction(
 }
 
 export async function deleteTransaction(
-  transactionId: string,
-  accessToken: string
+  transactionId: string
 ): Promise<boolean> {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
+    const accessToken = (await msalInstance.acquireTokenSilent(loginRequest))
+      .accessToken;
     const request = await fetch(
       `${BASE_URL}/DeleteTransaction?transactionId=${transactionId}`,
       {
@@ -98,11 +98,10 @@ export async function deleteTransaction(
 }
 
 export async function updateTransaction(
-  transaction: Transaction,
-  accessToken: string
+  transaction: Transaction
 ): Promise<Transaction> {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
+    const accessToken = await msalInstance.acquireTokenSilent(loginRequest);
     const request = await fetch(
       `${BASE_URL}/UpdateTransaction?transactionId=${transaction.id}`,
       {
@@ -130,11 +129,10 @@ export async function updateTransaction(
 export async function getDailyExpenseAnalytics(
   startDate: string,
   endDate: string,
-  transactionType: string,
-  accessToken: string
+  transactionType: string
 ): Promise<TotalTarnsactionAnalytics[]> {
   try {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const accessToken = await msalInstance.acquireTokenSilent(loginRequest);
 
     const request = await fetch(
       `${BASE_URL}/GetTotalTransactionAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
@@ -158,13 +156,11 @@ export async function getDailyExpenseAnalytics(
 export async function getTopCategoryItemAnalytics(
   startDate: string,
   endDate: string,
-  transactionType: string,
-  accessToken: string
+  transactionType: string
 ): Promise<CategoryItemAnalytics[]> {
   try {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const accessToken = await msalInstance.acquireTokenSilent(loginRequest);
 
-    console.log(accessToken);
     const request = await fetch(
       `${BASE_URL}/GetCategoryItemExpenseAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
       {
