@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { loginRequest, msalInstance } from "../authConfig";
+import { loginRequest } from "../authConfig";
 import { useUserStore } from "../stores/user-store";
 import { useMsal } from "@azure/msal-react";
 import { useEffect } from "react";
@@ -19,7 +19,7 @@ export default function Home() {
     const response = await instance.handleRedirectPromise();
 
     if (response) {
-      msalInstance.setActiveAccount(response.account);
+      instance.setActiveAccount(response.account);
       userStore.setUser({
         email: response.account.username,
         isLogged: true,

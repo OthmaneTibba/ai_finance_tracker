@@ -1,12 +1,12 @@
-import { loginRequest, msalInstance } from "../authConfig";
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "../authConfig";
 import { CategoryItemAnalytics } from "../models/category_item_analytics";
 import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics";
 
 import { Transaction } from "../models/transaction";
 
 async function getAccessToken() {
-  const account = await msalInstance.acquireTokenSilent(loginRequest);
-  const accessToken = account.accessToken;
+  const accessToken = "account.accessToken";
   return accessToken;
 }
 export async function getAllTransactions(): Promise<Transaction[]> {
