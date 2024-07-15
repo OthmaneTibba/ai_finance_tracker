@@ -18,9 +18,5 @@ export default function Home() {
     await instance.loginRedirect(loginRequest);
     await instance.handleRedirectPromise();
   };
-  return (
-    <div>
-      <button onClick={login}>Login</button>
-    </div>
-  );
+  return <div>Loading...</div>;
 }
