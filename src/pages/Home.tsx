@@ -1,11 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { loginRequest } from "../authConfig";
-import { useUserStore } from "../stores/user-store";
 import { useMsal } from "@azure/msal-react";
 import { useEffect } from "react";
 
 export default function Home() {
-  const userStore = useUserStore();
   const navigate = useNavigate();
   const { instance } = useMsal();
 
@@ -18,19 +16,11 @@ export default function Home() {
   }, [instance.getAllAccounts()]);
   const login = async () => {
     await instance.loginRedirect(loginRequest);
-    const response = await instance.handleRedirectPromise();
-
-    if (response) {
-      instance.setActiveAccount(response.account);
-      userStore.setUser({
-        email: response.account.username,
-        isLogged: true,
-      });
-    }
+    await instance.handleRedirectPromise();
   };
   return (
     <div>
-      <button>Login</button>
+      <button onClick={login}>Login</button>
     </div>
   );
 }
