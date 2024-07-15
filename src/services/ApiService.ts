@@ -1,5 +1,3 @@
-import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../authConfig";
 import { CategoryItemAnalytics } from "../models/category_item_analytics";
 import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics";
 
