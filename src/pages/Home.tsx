@@ -12,8 +12,6 @@ export default function Home() {
   useEffect(() => {
     if (instance.getAllAccounts().length > 0) {
       navigate("/dashboard");
-    } else {
-      login();
     }
   }, [instance.getAllAccounts()]);
   const login = async () => {
@@ -28,5 +26,9 @@ export default function Home() {
       });
     }
   };
-  return <div></div>;
+  return (
+    <div>
+      <button onClick={login}>Login</button>
+    </div>
+  );
 }
