@@ -42,6 +42,8 @@ import {
 } from "../services/ApiService";
 import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics";
 import { CategoryItemAnalytics } from "../models/category_item_analytics";
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "../authConfig";
 
 export default function Dashboard() {
   const userStore = useUserStore();
@@ -60,15 +62,25 @@ export default function Dashboard() {
 
   const [expenses, setExpenses] = useState<number>(0);
 
+  const { instance } = useMsal();
+
+  async function getAccessToken() {
+    const accessToken = (await instance.acquireTokenSilent(loginRequest))
+      .accessToken;
+    return accessToken;
+  }
+
   const getDailyAnalytics = async (
     startDate: string,
     endDate: string,
     transactionType: string = "Expense"
   ) => {
+    const token = await getAccessToken();
     const response = await getDailyExpenseAnalytics(
       startDate,
       endDate,
-      transactionType
+      transactionType,
+      token
     );
 
     setDailyAnalytics(response);
@@ -80,10 +92,12 @@ export default function Dashboard() {
     endDate: string,
     transactionType: string = "Expense"
   ) => {
+    const token = await getAccessToken();
     const data = await getTopCategoryItemAnalytics(
       startDate,
       endDate,
-      transactionType
+      transactionType,
+      token
     );
     setCategoryItemAnalytics(data);
   };

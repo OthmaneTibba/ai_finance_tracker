@@ -51,6 +51,8 @@ import {
 import { useTransactionsStore } from "../stores/transaction-store";
 import { useSelectedTransactionStore } from "../stores/selected-transaction-store";
 import { useNavigate, useParams } from "react-router-dom";
+import { loginRequest } from "../authConfig";
+import { useMsal } from "@azure/msal-react";
 type ErrorTransaction = {
   merchant: string;
   totalPrice: string;
@@ -93,12 +95,19 @@ export default function TransactionDetails() {
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  const [isDeleting, setDeleting] = useState<boolean>(false);
+  const { instance } = useMsal();
 
+  const [isDeleting, setDeleting] = useState<boolean>(false);
+  async function getAccessToken() {
+    const accessToken = (await instance.acquireTokenSilent(loginRequest))
+      .accessToken;
+    return accessToken;
+  }
   const onDeleteClicked = async (id: string) => {
     try {
       setDeleting(true);
-      const response = await deleteTransaction(id);
+      const token = await getAccessToken();
+      const response = await deleteTransaction(id, token);
       if (response) {
         toast({
           title: "success message",
@@ -169,7 +178,8 @@ export default function TransactionDetails() {
 
   const confirmUpdate = async () => {
     setIsUpdating(true);
-    const response = await updateTransaction(createTransaction);
+    const token = await getAccessToken();
+    const response = await updateTransaction(createTransaction, token);
 
     if (response) {
       const updatedTransaction: Transaction[] =
@@ -321,8 +331,9 @@ export default function TransactionDetails() {
 
   const saveTransactionToDb = async () => {
     try {
+      const token = await getAccessToken();
       setIsAddingTransaction(true);
-      const transaction = await saveTransaction(createTransaction);
+      const transaction = await saveTransaction(createTransaction, token);
 
       transactionsStore.setTransactions([
         ...transactionsStore.transactions,
