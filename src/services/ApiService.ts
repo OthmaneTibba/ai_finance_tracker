@@ -4,14 +4,13 @@ import { TotalTarnsactionAnalytics } from "../models/total_transaction_analytics
 
 import { Transaction } from "../models/transaction";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const FUNCTION_KEY = import.meta.env.VITE_FUNCTION_KEY;
 async function getAccessToken() {
   const account = await msalInstance.acquireTokenSilent(loginRequest);
   const accessToken = account.accessToken;
   return accessToken;
 }
 export async function getAllTransactions(): Promise<Transaction[]> {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const accessToken = await getAccessToken();
   const request = await fetch(`${BASE_URL}/GetTrancations`, {
     method: "get",
@@ -25,6 +24,7 @@ export async function getAllTransactions(): Promise<Transaction[]> {
 }
 
 export async function scanReceipt(formData: FormData): Promise<Transaction> {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
     const accessToken = await getAccessToken();
     const request = await fetch(`${BASE_URL}/ReadReceipt`, {
@@ -49,6 +49,7 @@ export async function scanReceipt(formData: FormData): Promise<Transaction> {
 export async function saveTransaction(
   createTransaction: Transaction
 ): Promise<Transaction> {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
     const accessToken = await getAccessToken();
     const request = await fetch(`${BASE_URL}/CreateTransactions`, {
@@ -74,6 +75,7 @@ export async function saveTransaction(
 export async function deleteTransaction(
   transactionId: string
 ): Promise<boolean> {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
     const accessToken = await getAccessToken();
     const request = await fetch(
@@ -100,6 +102,7 @@ export async function deleteTransaction(
 export async function updateTransaction(
   transaction: Transaction
 ): Promise<Transaction> {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   try {
     const accessToken = await getAccessToken();
     const request = await fetch(
@@ -132,6 +135,7 @@ export async function getDailyExpenseAnalytics(
   transactionType: string
 ): Promise<TotalTarnsactionAnalytics[]> {
   try {
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const accessToken = await getAccessToken();
     const request = await fetch(
       `${BASE_URL}/GetTotalTransactionAnalytics?transactionType=${transactionType}&startDate=${startDate}&endDate=${endDate}`,
@@ -158,6 +162,7 @@ export async function getTopCategoryItemAnalytics(
   transactionType: string
 ): Promise<CategoryItemAnalytics[]> {
   try {
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const accessToken = await getAccessToken();
     console.log(accessToken);
     const request = await fetch(
