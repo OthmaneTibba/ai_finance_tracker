@@ -31,9 +31,14 @@ function Receipt() {
   const { instance } = useMsal();
 
   async function getAccessToken() {
-    const accessToken = (await instance.acquireTokenSilent(loginRequest))
-      .accessToken;
-    return accessToken;
+    const account = (await instance.getAllAccounts().length) > 0;
+    if (account) {
+      instance.setActiveAccount(instance.getAllAccounts()[0]);
+      const accessToken = (await instance.acquireTokenSilent(loginRequest))
+        .accessToken;
+      return accessToken;
+    }
+    return "";
   }
   const getTransactions = async () => {
     if (transactionsStore.transactions.length === 0) {
